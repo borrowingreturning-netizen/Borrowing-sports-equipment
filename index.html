@@ -14,226 +14,433 @@
         body { font-family: 'Kanit', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-8">
+<body class="bg-slate-50 min-h-screen">
 
-    <div class="max-w-4xl mx-auto space-y-6">
-
-        <!-- Banner แจ้งเตือน AI LINE -->
-        <div id="aiAlertContainer" class="hidden"></div>
-
-        <!-- Header -->
-        <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-volleyball"></i> ระบบยืม-คืนอุปกรณ์กีฬา
-                </h1>
-                <p class="text-blue-100 text-sm mt-1">ระบบยืม-คืนพร้อม AI คำนวณค่าปรับ & แจ้งเตือนผ่าน LINE</p>
-            </div>
-            <div id="userInfo" class="hidden text-right">
-                <div id="userNameDisplay" class="font-medium text-sm"></div>
-                <button onclick="logout()" class="text-xs text-blue-200 hover:underline mt-1">ออกจากระบบ</button>
-            </div>
-        </div>
-
-        <!-- Section 1: ล็อกอิน (ชื่อ + รหัสนักศึกษา) -->
-        <div id="loginCard" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h2 class="text-lg font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-id-card text-blue-500"></i> เข้าสู่ระบบนักศึกษา / บุคลากร
-            </h2>
-            <p class="text-xs text-slate-400 mb-4">💡 สำหรับทดสอบแอดมิน: กรอกรหัสนักศึกษาเป็น <b>admin</b> หรือ <b>0000</b></p>
-            <form onsubmit="handleLogin(event)" class="space-y-4 max-w-md">
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">ชื่อ - นามสกุล</label>
-                    <input type="text" id="fullname" placeholder="ตัวอย่าง: สมชาย ใจดี" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+    <!-- 1. หน้าเข้าสู่ระบบ (LOGIN SECTION) -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 w-full max-w-md space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-volleyball"></i>
                 </div>
+                <h1 class="text-2xl font-bold text-slate-800">เข้าสู่ระบบยืม-คืนอุปกรณ์</h1>
+                <p class="text-xs text-slate-400">กรุณากรอกข้อมูลเพื่อเข้าใช้งานระบบ</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">รหัสนักศึกษา</label>
-                    <input type="text" id="studentId" placeholder="ตัวอย่าง: 6601234567" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">ประเภทผู้ใช้งาน</label>
+                    <select id="loginRole" onchange="toggleLoginFields()" class="w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <option value="user">นักศึกษา / บุคลากร (Student)</option>
+                        <option value="admin">ผู้ดูแลระบบ (Admin)</option>
+                    </select>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-medium transition duration-200">
-                    เข้าสู่ระบบ
+
+                <div id="studentFields" class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล</label>
+                        <input type="text" id="loginName" placeholder="เช่น นายสมชาย ใจดี" class="w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">รหัสนักศึกษา</label>
+                        <input type="text" id="loginStudentId" placeholder="เช่น 6601234567" class="w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                </div>
+
+                <div id="adminFields" class="hidden space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน Admin</label>
+                        <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน (admin123)" class="w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-medium transition text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
                 </button>
             </form>
         </div>
-
-        <!-- Section 2: ฟอร์มยืมอุปกรณ์ (ยืมได้ทั้ง User และ Admin) -->
-        <div id="borrowSection" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-            <h2 class="text-lg font-semibold text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-pen-to-square text-blue-500"></i> บันทึกการยืมอุปกรณ์
-            </h2>
-            <form onsubmit="handleBorrow(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">เลือกอุปกรณ์</label>
-                    <select id="itemSelect" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="ลูกฟุตบอล" data-price="350">⚽ ลูกฟุตบอล (350 บ.)</option>
-                        <option value="ลูกบาสเกตบอล" data-price="450">🏀 ลูกบาสเกตบอล (450 บ.)</option>
-                        <option value="ไม้แบดมินตัน" data-price="300">🏸 ไม้แบดมินตัน (300 บ.)</option>
-                        <option value="ลูกวอลเลย์บอล" data-price="400">🏐 ลูกวอลเลย์บอล (400 บ.)</option>
-                        <option value="ชุดไม้ปิงปอง" data-price="250">🏓 ชุดไม้ปิงปอง (250 บ.)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">จำนวน</label>
-                    <input type="number" id="itemQty" min="1" max="5" value="1" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">จำนวนวันที่ยืม (วัน)</label>
-                    <input type="number" id="borrowDays" min="1" max="7" value="3" required class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div class="md:col-span-3">
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-medium transition duration-200 flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> ยืนยันการยืมอุปกรณ์
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Section 3: ตารางประวัติการยืม -->
-        <div id="historySection" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-4">
-                <h2 id="tableTitle" class="text-lg font-semibold text-slate-700 flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-blue-500"></i> รายการการยืมอุปกรณ์
-                </h2>
-                <span id="roleBadge" class="text-xs px-3 py-1 rounded-full font-medium"></span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b bg-slate-50 text-slate-600 text-sm">
-                            <th class="p-3">ผู้ยืม / รหัส</th>
-                            <th class="p-3">รายการ</th>
-                            <th class="p-3">จำนวน</th>
-                            <th class="p-3">กำหนดคืน</th>
-                            <th class="p-3">สถานะ</th>
-                            <th class="p-3">การจัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTable" class="text-sm divide-y"></tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Modal จัดการการคืนสำหรับ ADMIN -->
+    <!-- 2. หน้าหลักระบบ (MAIN SYSTEM SECTION) -->
+    <div id="mainPage" class="hidden p-4 md:p-8">
+        <div class="max-w-6xl mx-auto space-y-6">
+
+            <!-- Header (ซ่อนชื่อ/ยศ Admin) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-volleyball text-blue-600"></i> ระบบยืม-คืนอุปกรณ์กีฬา
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-1">labuakannika451-cmyk.github.io/Borrowing-sports-equipment</p>
+                </div>
+                <div class="flex items-center gap-3 self-end md:self-auto">
+                    <div class="text-right">
+                        <span id="currentUserDisplay" class="text-sm font-medium text-slate-700 block"></span>
+                    </div>
+                    <button onclick="handleLogout()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-sm px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Management Bar -->
+            <div id="adminControlBar" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl flex justify-between items-center">
+                <div class="font-medium text-amber-900 flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-wrench"></i> ส่วนจัดการคลังสำหรับแอดมิน
+                </div>
+                <button onclick="addNewEquipment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg transition font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-plus"></i> เพิ่มอุปกรณ์ใหม่
+                </button>
+            </div>
+
+            <!-- Section 1: รายการอุปกรณ์กีฬาในคลัง -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    📦 รายการอุปกรณ์กีฬาในคลัง
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b bg-slate-50 text-slate-600 text-sm">
+                                <th class="p-3">รหัส</th>
+                                <th class="p-3">ชื่ออุปกรณ์</th>
+                                <th class="p-3">จำนวนคงเหลือ</th>
+                                <th class="p-3">สถานะ</th>
+                                <th class="p-3 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable" class="text-sm divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section 2: ฟอร์มยืมอุปกรณ์กีฬา (ดึงชื่อผู้ยืมอัตโนมัติ) -->
+            <div id="borrowFormSection" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    📝 ฟอร์มยืมอุปกรณ์กีฬา
+                </h2>
+                <form onsubmit="handleBorrow(event)" class="flex flex-col md:flex-row gap-3">
+                    <input type="text" id="borrowerInfoDisplay" readonly class="px-4 py-2 border rounded-lg bg-slate-100 text-slate-600 outline-none md:w-1/3 text-sm font-medium" title="ข้อมูลผู้ยืม">
+                    <select id="itemSelect" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-2/3 text-sm"></select>
+                    <input type="number" id="itemQty" min="1" value="1" required class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-1/6 text-sm">
+                    <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition duration-200 text-sm flex items-center justify-center gap-2">
+                        ยืมอุปกรณ์
+                    </button>
+                </form>
+            </div>
+
+            <!-- Section 3: ประวัติการยืม-คืน (แสดงวันเวลา & User ห้ามกดคืนเอง) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    📋 ประวัติการยืม-คืน (แสดงวันและเวลา)
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b bg-slate-50 text-slate-600 text-sm">
+                                <th class="p-3">ผู้ยืม (ชื่อ - รหัส)</th>
+                                <th class="p-3">รายการ</th>
+                                <th class="p-3">จำนวน</th>
+                                <th class="p-3">เวลาที่ยืม</th>
+                                <th class="p-3">กำหนดคืน</th>
+                                <th class="p-3">เวลาที่คืนจริง</th>
+                                <th class="p-3">สถานะ</th>
+                                <th class="p-3 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable" class="text-sm divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal คืนสินค้าสำหรับ ADMIN -->
     <div id="returnModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
             <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-clipboard-check text-green-600"></i> อนุมัติการคืนอุปกรณ์ (Admin)
+                <i class="fa-solid fa-clipboard-check text-green-600"></i> อนุมัติการคืนอุปกรณ์ (Admin Only)
             </h3>
             <div id="modalItemInfo" class="bg-slate-50 p-3 rounded-xl text-sm text-slate-600 space-y-1"></div>
             
             <form onsubmit="confirmReturn(event)" class="space-y-3">
-                <input type="hidden" id="modalItemId">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">สภาพอุปกรณ์ตอนนำมาคืน:</label>
-                    <select id="returnCondition" onchange="calculateFine()" class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="returnCondition" onchange="calculateFine()" class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         <option value="normal">✅ สภาพปกติครบถ้วน</option>
-                        <option value="damaged">⚠️ อุปกรณ์เสียหาย (คิด 50% ของราคา)</option>
-                        <option value="lost">🚨 อุปกรณ์สูญหาย (คิด 100% ของราคา)</option>
+                        <option value="damaged">⚠️ อุปกรณ์เสียหาย</option>
+                        <option value="lost">🚨 อุปกรณ์สูญหาย</option>
                     </select>
                 </div>
                 <div id="fineCalculationDisplay" class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1"></div>
                 <div class="flex gap-2 justify-end pt-2">
                     <button type="button" onclick="closeReturnModal()" class="px-4 py-2 bg-slate-200 text-slate-600 rounded-xl text-sm font-medium">ยกเลิก</button>
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700">ยืนยันการคืน & ส่ง LINE แจ้งเตือน</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700">ยืนยันบันทึกเวลาคืน & ส่ง LINE</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        let currentUser = null;
-        let currentStudentId = null;
-        let isAdmin = false;
+        let currentUser = null; 
         let activeReturnId = null;
+        
+        // ลิงก์ LINE Official Account ของคุณ
+        const LINE_LINK = "https://line.me/R/ti/p/@428xebij"; 
 
-        let borrowHistory = [
-            { id: 1, user: "สมชาย ใจดี", studentId: "6601234567", item: "ลูกฟุตบอล", qty: 1, itemPrice: 350, borrowDate: "2026-08-10", dueDate: "2026-08-13", returned: false, fineInfo: "" },
-            { id: 2, user: "กานดา รักเรียน", studentId: "6607654321", item: "ไม้แบดมินตัน", qty: 2, itemPrice: 300, borrowDate: "2026-08-15", dueDate: "2026-08-18", returned: false, fineInfo: "" }
+        // ข้อมูลคลังอุปกรณ์
+        let inventory = [
+            { id: "SP01", name: "ลูกฟุตบอล", qty: 10 },
+            { id: "SP02", name: "บาสเกตบอล", qty: 5 },
+            { id: "SP03", name: "ไม้แบดมินตัน", qty: 8 },
+            { id: "SP04", name: "ลูกวอลเลย์บอล", qty: 0 },
+            { id: "SP05", name: "ลูกปิงปอง", qty: 20 }
         ];
+
+        // ประวัติการยืม
+        let borrowHistory = [
+            { 
+                id: 1, 
+                borrowerName: "นายสมชาย ใจดี", 
+                studentId: "6601234567", 
+                itemId: "SP01", 
+                itemName: "ลูกฟุตบอล", 
+                qty: 1, 
+                borrowTime: "10/08/2026, 09:30", 
+                dueTime: "13/08/2026, 16:30", 
+                returnTime: "13/08/2026, 15:10",
+                returned: true 
+            }
+        ];
+
+        function toggleLoginFields() {
+            const role = document.getElementById('loginRole').value;
+            if (role === 'admin') {
+                document.getElementById('studentFields').classList.add('hidden');
+                document.getElementById('adminFields').classList.remove('hidden');
+            } else {
+                document.getElementById('studentFields').classList.remove('hidden');
+                document.getElementById('adminFields').classList.add('hidden');
+            }
+        }
 
         function handleLogin(e) {
             e.preventDefault();
-            currentUser = document.getElementById('fullname').value.trim();
-            currentStudentId = document.getElementById('studentId').value.trim();
+            const role = document.getElementById('loginRole').value;
 
-            isAdmin = (currentStudentId.toLowerCase() === 'admin' || currentStudentId === '0000');
-
-            document.getElementById('loginCard').classList.add('hidden');
-            document.getElementById('borrowSection').classList.remove('hidden');
-            document.getElementById('historySection').classList.remove('hidden');
-            document.getElementById('userInfo').classList.remove('hidden');
-
-            const nameDisplay = document.getElementById('userNameDisplay');
-            const roleBadge = document.getElementById('roleBadge');
-
-            if(isAdmin) {
-                nameDisplay.innerHTML = `<span class="bg-amber-500 text-white px-3 py-1 rounded-full font-bold">👑 ADMIN MODE</span>`;
-                roleBadge.innerText = "โหมดผู้ดูแลระบบ (Admin)";
-                roleBadge.className = "text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-medium";
-                document.getElementById('tableTitle').innerText = "📋 ประวัติการยืมของนักศึกษาทั้งหมด";
+            if (role === 'admin') {
+                const pass = document.getElementById('adminPassword').value;
+                if (pass === 'admin123') { 
+                    currentUser = { name: "ผู้ดูแลระบบ", studentId: "ADMIN", role: "admin" };
+                } else {
+                    alert("รหัสผ่าน Admin ไม่ถูกต้อง!");
+                    return;
+                }
             } else {
-                nameDisplay.innerHTML = `<span class="bg-blue-700 text-white px-3 py-1 rounded-full">👤 ${currentUser} (${currentStudentId})</span>`;
-                roleBadge.innerText = "โหมดนักศึกษาทั่วไป";
-                roleBadge.className = "text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium";
-                document.getElementById('tableTitle').innerText = "🕒 ประวัติการยืมของคุณ";
+                const name = document.getElementById('loginName').value.trim();
+                const studentId = document.getElementById('loginStudentId').value.trim();
+                if (!name || !studentId) {
+                    alert("กรุณากรอกชื่อและรหัสนักศึกษาให้ครบถ้วน");
+                    return;
+                }
+                currentUser = { name: name, studentId: studentId, role: "user" };
             }
 
-            checkAIAlerts();
-            renderTable();
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+
+            // ซ่อนป้ายชื่อ Admin บนหน้าเว็บ
+            document.getElementById('currentUserDisplay').innerText = currentUser.role === 'admin' ? '' : `${currentUser.name} (${currentUser.studentId})`;
+            document.getElementById('borrowerInfoDisplay').value = `${currentUser.name} (${currentUser.studentId})`;
+
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminControlBar').classList.remove('hidden');
+                document.getElementById('borrowFormSection').classList.add('hidden');
+            } else {
+                document.getElementById('adminControlBar').classList.add('hidden');
+                document.getElementById('borrowFormSection').classList.remove('hidden');
+            }
+
+            renderInventory();
+            renderHistoryTable();
         }
 
-        function logout() {
+        function handleLogout() {
             currentUser = null;
-            currentStudentId = null;
-            isAdmin = false;
-            document.getElementById('loginCard').classList.remove('hidden');
-            document.getElementById('borrowSection').classList.add('hidden');
-            document.getElementById('historySection').classList.add('hidden');
-            document.getElementById('userInfo').classList.add('hidden');
-            document.getElementById('aiAlertContainer').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginStudentId').value = '';
+            document.getElementById('adminPassword').value = '';
         }
 
+        function renderInventory() {
+            const tbody = document.getElementById('inventoryTable');
+            const select = document.getElementById('itemSelect');
+            
+            tbody.innerHTML = inventory.map(item => {
+                const isAvailable = item.qty > 0;
+                const statusBadge = isAvailable 
+                    ? `<span class="bg-emerald-700 text-white px-3 py-1 rounded-full text-xs font-medium">พร้อมยืม</span>`
+                    : `<span class="bg-rose-600 text-white px-3 py-1 rounded-full text-xs font-medium">ของหมด</span>`;
+                
+                let actionBtn = '';
+                if (currentUser && currentUser.role === 'admin') {
+                    actionBtn = `<button onclick="editStock('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-1 rounded-lg text-xs font-medium">แก้ไขสต็อก</button>`;
+                } else {
+                    actionBtn = isAvailable 
+                        ? `<button onclick="selectItemToBorrow('${item.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1 rounded-lg text-xs font-medium">ยืม</button>`
+                        : `<button disabled class="bg-slate-400 text-white px-4 py-1 rounded-lg text-xs font-medium cursor-not-allowed">ยืม</button>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-semibold text-slate-700">${item.id}</td>
+                        <td class="p-3 font-medium text-slate-800">${item.name}</td>
+                        <td class="p-3 text-slate-600">${item.qty} ชิ้น</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-center">${actionBtn}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            select.innerHTML = inventory.map(item => 
+                `<option value="${item.id}" ${item.qty === 0 ? 'disabled' : ''}>${item.name} (เหลือ ${item.qty})</option>`
+            ).join('');
+        }
+
+        function selectItemToBorrow(itemId) {
+            document.getElementById('itemSelect').value = itemId;
+        }
+
+        function addNewEquipment() {
+            const name = prompt("กรอกชื่ออุปกรณ์ใหม่:");
+            if (!name) return;
+            const qty = parseInt(prompt("กรอกจำนวนสต็อกเริ่มต้น:", "5") || "0");
+            
+            const newId = "SP0" + (inventory.length + 1);
+            inventory.push({ id: newId, name: name, qty: qty });
+            renderInventory();
+        }
+
+        function editStock(itemId) {
+            const item = inventory.find(i => i.id === itemId);
+            const newQty = prompt(`แก้ไขจำนวนสต็อกของ ${item.name}:`, item.qty);
+            if (newQty !== null) {
+                item.qty = parseInt(newQty) || 0;
+                renderInventory();
+            }
+        }
+
+        function formatDateTime(dateObj) {
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year}, ${hours}:${minutes}`;
+        }
+
+        // การยืมอุปกรณ์ (บังคับกดตกลงเปิด LINE เท่านั้น)
         function handleBorrow(e) {
             e.preventDefault();
-            const select = document.getElementById('itemSelect');
-            const item = select.value;
-            const price = parseInt(select.options[select.selectedIndex].getAttribute('data-price'));
+            const itemId = document.getElementById('itemSelect').value;
             const qty = parseInt(document.getElementById('itemQty').value);
-            const days = parseInt(document.getElementById('borrowDays').value);
+            const item = inventory.find(i => i.id === itemId);
 
-            const today = new Date();
-            const dueDate = new Date();
-            dueDate.setDate(today.getDate() + days);
+            if (!item || item.qty < qty) {
+                alert("อุปกรณ์ไม่พอสำหรับการยืม!");
+                return;
+            }
 
-            const newItem = {
-                id: Date.now(),
-                user: currentUser,
-                studentId: currentStudentId,
-                item: item,
-                qty: qty,
-                itemPrice: price,
-                borrowDate: today.toISOString().split('T')[0],
-                dueDate: dueDate.toISOString().split('T')[0],
-                returned: false,
-                fineInfo: ""
-            };
+            const confirmLine = confirm("⚠️ [เงื่อนไขการยืมอุปกรณ์]\n\nคุณต้องกด 'ตกลง' เพื่อเชื่อมต่อกับ LINE บอทรับการแจ้งเตือนวันคืนอุปกรณ์\n\n(หากกด 'ยกเลิก' รายการยืมนี้จะไม่สำเร็จ)");
 
-            borrowHistory.unshift(newItem);
-            renderTable();
-            checkAIAlerts();
-            alert("บันทึกการยืมสำเร็จ! ระบบได้ลงทะเบียนวันคืนและ AI แจ้งเตือนเรียบร้อย");
+            if (confirmLine) {
+                item.qty -= qty;
+
+                const now = new Date();
+                const dueDate = new Date();
+                dueDate.setDate(now.getDate() + 3);
+
+                borrowHistory.unshift({
+                    id: Date.now(),
+                    borrowerName: currentUser.name,
+                    studentId: currentUser.studentId,
+                    itemId: item.id,
+                    itemName: item.name,
+                    qty: qty,
+                    borrowTime: formatDateTime(now),
+                    dueTime: formatDateTime(dueDate),
+                    returnTime: "-",
+                    returned: false,
+                    rawDueDate: dueDate
+                });
+
+                renderInventory();
+                renderHistoryTable();
+
+                // เปิด LINE บอทของคุณ (@428xebij)
+                window.open(LINE_LINK, "_blank");
+            } else {
+                alert("❌ รายการยืมถูกยกเลิก! คุณจำเป็นต้องกดตกลงเพื่อยืนยันการแจ้งเตือนผ่าน LINE จึงจะสามารถยืมอุปกรณ์ได้");
+            }
+        }
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('historyTable');
+            const now = new Date();
+
+            if (borrowHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">ยังไม่มีประวัติการยืม</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = borrowHistory.map(i => {
+                let statusBadge = '';
+                const isOverdue = !i.returned && i.rawDueDate && now > i.rawDueDate;
+
+                if(i.returned) {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">คืนแล้ว</span>`;
+                } else if(isOverdue) {
+                    statusBadge = `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-xs font-medium">🚨 เลยกำหนดคืน</span>`;
+                } else {
+                    statusBadge = `<span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium">ยืมอยู่</span>`;
+                }
+
+                // ล็อกสิทธิ์ User ห้ามกดคืนเอง
+                let actionBtn = '';
+                if (currentUser && currentUser.role === 'admin' && !i.returned) {
+                    actionBtn = `<button onclick="openReturnModal(${i.id})" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition font-medium">อนุมัติคืน / ตรวจสภาพ</button>`;
+                } else if (i.returned) {
+                    actionBtn = `<span class="text-xs text-slate-400">คืนเรียบร้อย</span>`;
+                } else {
+                    actionBtn = `<span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">ติดต่อ Admin เพื่อคืน</span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-semibold text-slate-700">${i.borrowerName} <span class="text-slate-400 text-xs block">(${i.studentId})</span></td>
+                        <td class="p-3 font-medium text-slate-700">${i.itemName}</td>
+                        <td class="p-3 text-slate-600">${i.qty}</td>
+                        <td class="p-3 text-xs text-slate-600">${i.borrowTime}</td>
+                        <td class="p-3 text-xs text-slate-600">${i.dueTime}</td>
+                        <td class="p-3 text-xs font-medium ${i.returnTime !== '-' ? 'text-emerald-600' : 'text-slate-400'}">${i.returnTime}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-center">${actionBtn}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function openReturnModal(id) {
             activeReturnId = id;
             const item = borrowHistory.find(i => i.id === id);
-            document.getElementById('modalItemId').value = id;
             document.getElementById('modalItemInfo').innerHTML = `
-                <b>ผู้ยืม:</b> ${item.user} (${item.studentId})<br>
-                <b>รายการ:</b> ${item.item} จำนวน ${item.qty} ชิ้น<br>
-                <b>กำหนดคืน:</b> ${item.dueDate}
+                <b>ผู้ยืม:</b> ${item.borrowerName} (${item.studentId})<br>
+                <b>รายการ:</b> ${item.itemName} จำนวน ${item.qty} ชิ้น<br>
+                <b>เวลาที่ยืม:</b> ${item.borrowTime}<br>
+                <b>กำหนดคืน:</b> ${item.dueTime}
             `;
             document.getElementById('returnModal').classList.remove('hidden');
             calculateFine();
@@ -244,37 +451,27 @@
         }
 
         function calculateFine() {
-            const id = activeReturnId;
-            const item = borrowHistory.find(i => i.id === id);
+            const item = borrowHistory.find(i => i.id === activeReturnId);
             const condition = document.getElementById('returnCondition').value;
-            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
 
             let lateDays = 0;
-            if(today > item.dueDate) {
-                const diffTime = Math.abs(new Date(today) - new Date(item.dueDate));
+            if(item.rawDueDate && now > item.rawDueDate) {
+                const diffTime = Math.abs(now - item.rawDueDate);
                 lateDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             }
 
-            let lateFine = lateDays * 20 * item.qty; // คิดวันละ 20 บาท/ชิ้น
-            let damageFine = 0;
+            let lateFine = lateDays * 20 * item.qty;
 
-            if(condition === 'damaged') {
-                damageFine = (item.itemPrice * 0.5) * item.qty;
-            } else if(condition === 'lost') {
-                damageFine = (item.itemPrice * 1.0) * item.qty;
-            }
-
-            let totalFine = lateFine + damageFine;
-
-            let text = `<b>🤖 AI คำนวณค่าปรับ & ความเสียหาย:</b><br>`;
-            if(lateDays > 0) text += `• คืนช้า ${lateDays} วัน: คิดค่าปรับ ${lateFine} บาท (วันละ 20 บ.)<br>`;
-            if(condition === 'damaged') text += `• สภาพชำรุดเสียหาย: คิด 50% = ${damageFine} บาท<br>`;
-            if(condition === 'lost') text += `• อุปกรณ์สูญหาย: คิดราคาเต็ม 100% = ${damageFine} บาท<br>`;
+            let text = `<b>🤖 AI คำนวณค่าปรับ:</b><br>`;
+            if(lateDays > 0) text += `• คืนช้า ${lateDays} วัน: ${lateFine} บาท<br>`;
+            if(condition === 'damaged') text += `• สถานะ: อุปกรณ์เสียหาย (ดำเนินการตามระเบียบ)<br>`;
+            if(condition === 'lost') text += `• สถานะ: อุปกรณ์สูญหาย (ดำเนินการตามระเบียบ)<br>`;
             
-            if(totalFine === 0) {
-                text += `<b class="text-green-600">✅ คืนตรงเวลา สภาพสมบูรณ์ (ไม่มีค่าปรับ)</b>`;
-            } else {
-                text += `<b class="text-red-600">💰 รวมยอดเงินที่ต้องชำระ: ${totalFine} บาท</b>`;
+            if(lateFine === 0 && condition === 'normal') {
+                text += `<b class="text-emerald-600">✅ ไม่มีค่าปรับ</b>`;
+            } else if(lateFine > 0) {
+                text += `<b class="text-rose-600">💰 รวมค่าปรับล่าช้า: ${lateFine} บาท</b>`;
             }
 
             document.getElementById('fineCalculationDisplay').innerHTML = text;
@@ -282,98 +479,22 @@
 
         function confirmReturn(e) {
             e.preventDefault();
-            const id = activeReturnId;
-            const item = borrowHistory.find(i => i.id === id);
+            const item = borrowHistory.find(i => i.id === activeReturnId);
             const condition = document.getElementById('returnCondition').value;
-
+            
             item.returned = true;
+            item.returnTime = formatDateTime(new Date());
 
-            const fineText = document.getElementById('fineCalculationDisplay').innerText.replace("🤖 AI คำนวณค่าปรับ & ความเสียหาย:", "");
-            item.fineInfo = fineText;
+            if (condition !== 'lost') {
+                const invItem = inventory.find(inv => inv.id === item.itemId);
+                if (invItem) invItem.qty += item.qty;
+            }
 
-            // จำลองส่ง LINE Notification
-            alert(`✅ บันทึกการคืนเรียบร้อย!\n\n📲 [LINE Notify AI Alert] ส่งไปยังนักศึกษา (${item.user}):\n------------------------\n${fineText}`);
-            
             closeReturnModal();
-            renderTable();
-            checkAIAlerts();
-        }
+            renderInventory();
+            renderHistoryTable();
 
-        function checkAIAlerts() {
-            const container = document.getElementById('aiAlertContainer');
-            const today = new Date().toISOString().split('T')[0];
-            let alerts = [];
-
-            const listToCheck = isAdmin ? borrowHistory : borrowHistory.filter(i => i.studentId === currentStudentId);
-
-            listToCheck.forEach(i => {
-                if(!i.returned) {
-                    if(i.dueDate < today) {
-                        alerts.push(`🚨 <b>[LINE AI Alert] ${i.item} (${i.user}):</b> เลยกำหนดคืนแล้ว! ระบบเริ่มคิดค่าปรับวันละ 20 บาท/ชิ้น`);
-                    } else if(i.dueDate === today) {
-                        alerts.push(`⚠️ <b>[LINE AI Alert] ${i.item} (${i.user}):</b> ครบกำหนดคืนวันนี้! กรุณานำมาคืนเพื่อหลีกเลี่ยงค่าปรับ`);
-                    }
-                }
-            });
-
-            if(alerts.length > 0) {
-                container.className = "bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl shadow-sm text-amber-900 space-y-1";
-                container.innerHTML = `<div class="font-bold flex items-center gap-2 text-amber-800"><i class="fa-brands fa-line text-green-500 text-xl"></i> AI แจ้งเตือนสถานะอุปกรณ์ผ่าน LINE:</div>` + 
-                    alerts.map(a => `<p class="text-sm pl-6">• ${a}</p>`).join('');
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('historyTable');
-            const today = new Date().toISOString().split('T')[0];
-            
-            const displayData = isAdmin ? borrowHistory : borrowHistory.filter(i => i.studentId === currentStudentId);
-
-            if(displayData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">ยังไม่มีรายการยืมอุปกรณ์</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = displayData.map(i => {
-                let statusBadge = '';
-                if(i.returned) {
-                    statusBadge = `<span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-medium">คืนแล้ว</span>`;
-                } else if(i.dueDate < today) {
-                    statusBadge = `<span class="bg-red-100 text-red-700 px-2.5 py-1 rounded-full text-xs font-medium">🚨 เลยกำหนดคืน</span>`;
-                } else if(i.dueDate === today) {
-                    statusBadge = `<span class="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full text-xs font-medium">⚠️ คืนวันนี้</span>`;
-                } else {
-                    statusBadge = `<span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium">ยืมอยู่</span>`;
-                }
-
-                let actionButton = '';
-                if(isAdmin) {
-                    actionButton = !i.returned ? 
-                        `<button onclick="openReturnModal(${i.id})" class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg transition font-medium">อนุมัติคืน / ตรวจสภาพ</button>` : 
-                        `<span class="text-xs text-slate-400">คืนเรียบร้อย</span>`;
-                } else {
-                    actionButton = !i.returned ? 
-                        `<span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200">ติดต่อ Admin เพื่อคืน</span>` : 
-                        `<span class="text-xs text-slate-400">คืนเรียบร้อย</span>`;
-                }
-
-                return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3">
-                            <div class="font-semibold text-slate-700">${i.user}</div>
-                            <div class="text-xs text-slate-400">รหัส: ${i.studentId}</div>
-                        </td>
-                        <td class="p-3 font-medium text-slate-700">${i.item}</td>
-                        <td class="p-3">${i.qty}</td>
-                        <td class="p-3 text-slate-500">${i.dueDate}</td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3">${actionButton}</td>
-                    </tr>
-                `;
-            }).join('');
+            window.open(LINE_LINK, "_blank");
         }
     </script>
 </body>
