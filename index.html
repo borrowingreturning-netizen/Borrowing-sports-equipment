@@ -14,7 +14,21 @@
         body { font-family: 'Kanit', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen relative">
+
+    <!-- Toast Notification สำหรับแจ้งเตือน Real-time -->
+    <div id="toastNotification" class="hidden fixed top-5 right-5 z-50 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 max-w-sm flex items-start gap-3 transition-all transform duration-300">
+        <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center shrink-0 text-lg">
+            <i class="fa-solid fa-bell animate-bounce"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-semibold text-sm text-amber-400">แจ้งเตือนรายการยืมใหม่!</h4>
+            <p id="toastMessage" class="text-xs text-slate-300 mt-1 break-words"></p>
+        </div>
+        <button onclick="hideToast()" class="text-slate-400 hover:text-white text-xs p-1">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
 
     <!-- 1. หน้าเข้าสู่ระบบ (LOGIN SECTION) -->
     <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
@@ -50,7 +64,6 @@
                 <div id="adminFields" class="hidden space-y-3">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน Admin</label>
-                        <!-- ลบ (admin123) ออกแล้ว -->
                         <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน" class="w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                     </div>
                 </div>
@@ -87,7 +100,7 @@
             <!-- Admin Management Bar -->
             <div id="adminControlBar" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div class="font-medium text-amber-900 flex items-center gap-2 text-sm break-words">
-                    <i class="fa-solid fa-wrench shrink-0"></i> ส่วนจัดการคลังสำหรับแอดมิน
+                    <i class="fa-solid fa-wrench shrink-0"></i> ส่วนจัดการคลังสำหรับแอดมิน (Real-time Sync Active)
                 </div>
                 <button onclick="addNewEquipment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg transition font-medium flex items-center gap-1 w-full sm:w-auto justify-center">
                     <i class="fa-solid fa-plus"></i> เพิ่มอุปกรณ์ใหม่
@@ -189,7 +202,11 @@
         
         const LINE_LINK = "https://line.me/R/ti/p/@428xebij"; 
 
-        let inventory = [
+        // สร้าง BroadcastChannel เพื่อสื่อสารระหว่างแท็บในเครื่องเดียวกัน
+        const syncChannel = new BroadcastChannel('sports_borrow_channel');
+
+        // ข้อมูลเริ่มต้น
+        const initialInventory = [
             { id: "SP01", name: "ลูกฟุตบอล", qty: 10 },
             { id: "SP02", name: "บาสเกตบอล", qty: 5 },
             { id: "SP03", name: "ไม้แบดมินตัน", qty: 8 },
@@ -197,20 +214,63 @@
             { id: "SP05", name: "ลูกปิงปอง", qty: 20 }
         ];
 
-        let borrowHistory = [
-            { 
-                id: 1, 
-                borrowerName: "นายสมชาย ใจดี", 
-                studentId: "6601234567", 
-                itemId: "SP01", 
-                itemName: "ลูกฟุตบอล", 
-                qty: 1, 
-                borrowTime: "10/08/2026, 09:30", 
-                dueTime: "13/08/2026, 16:30", 
-                returnTime: "13/08/2026, 15:10",
-                returned: true 
+        // อ่านข้อมูลจาก LocalStorage หรือค่าเริ่มต้น
+        let inventory = JSON.parse(localStorage.getItem('app_inventory')) || initialInventory;
+        let borrowHistory = JSON.parse(localStorage.getItem('app_borrow_history')) || [];
+
+        function saveData() {
+            localStorage.setItem('app_inventory', JSON.stringify(inventory));
+            localStorage.setItem('app_borrow_history', JSON.stringify(borrowHistory));
+        }
+
+        // ระบบรับข้อความ Real-time จากแท็บอื่น
+        syncChannel.onmessage = (event) => {
+            const { type, data, newInventory, updatedHistory } = event.data;
+
+            if (type === 'UPDATE_ALL') {
+                inventory = newInventory;
+                borrowHistory = updatedHistory;
+                saveData();
+                renderInventory();
+                renderHistoryTable();
+
+                // หากสวมบทบาทเป็น Admin ให้แสดงป๊อปอัป + ส่งเสียงแจ้งเตือน
+                if (currentUser && currentUser.role === 'admin' && data) {
+                    playNotificationSound();
+                    showToast(`${data.borrowerName} ยืม ${data.itemName} (${data.qty} ชิ้น)`);
+                }
             }
-        ];
+        };
+
+        function playNotificationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } catch (e) {
+                console.log("Audio play blocked", e);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => hideToast(), 5000);
+        }
+
+        function hideToast() {
+            document.getElementById('toastNotification').classList.add('hidden');
+        }
 
         function toggleLoginFields() {
             const role = document.getElementById('loginRole').value;
@@ -318,7 +378,9 @@
             
             const newId = "SP0" + (inventory.length + 1);
             inventory.push({ id: newId, name: name, qty: qty });
+            saveData();
             renderInventory();
+            syncChannel.postMessage({ type: 'UPDATE_ALL', newInventory: inventory, updatedHistory: borrowHistory });
         }
 
         function editStock(itemId) {
@@ -326,7 +388,9 @@
             const newQty = prompt(`แก้ไขจำนวนสต็อกของ ${item.name}:`, item.qty);
             if (newQty !== null) {
                 item.qty = parseInt(newQty) || 0;
+                saveData();
                 renderInventory();
+                syncChannel.postMessage({ type: 'UPDATE_ALL', newInventory: inventory, updatedHistory: borrowHistory });
             }
         }
 
@@ -359,7 +423,7 @@
                 const dueDate = new Date();
                 dueDate.setDate(now.getDate() + 3);
 
-                borrowHistory.unshift({
+                const newBorrowRecord = {
                     id: Date.now(),
                     borrowerName: currentUser.name,
                     studentId: currentUser.studentId,
@@ -370,15 +434,26 @@
                     dueTime: formatDateTime(dueDate),
                     returnTime: "-",
                     returned: false,
-                    rawDueDate: dueDate
-                });
+                    rawDueDate: dueDate.toISOString()
+                };
 
+                borrowHistory.unshift(newBorrowRecord);
+
+                saveData();
                 renderInventory();
                 renderHistoryTable();
 
+                // บรอดแคสต์ส่งข้อมูลไปยังแท็บอื่นทันที
+                syncChannel.postMessage({ 
+                    type: 'UPDATE_ALL', 
+                    data: newBorrowRecord, 
+                    newInventory: inventory, 
+                    updatedHistory: borrowHistory 
+                });
+
                 window.open(LINE_LINK, "_blank");
             } else {
-                alert("❌ รายการยืมถูกยกเลิก! คุณจำเป็นต้องกดตกลงเพื่อยืนยันการแจ้งเตือนผ่าน LINE จึงจะสามารถยืมอุปกรณ์ได้");
+                alert("❌ รายการยืมถูกยกเลิก!");
             }
         }
 
@@ -393,7 +468,8 @@
 
             tbody.innerHTML = borrowHistory.map(i => {
                 let statusBadge = '';
-                const isOverdue = !i.returned && i.rawDueDate && now > i.rawDueDate;
+                const dueDateObj = i.rawDueDate ? new Date(i.rawDueDate) : null;
+                const isOverdue = !i.returned && dueDateObj && now > dueDateObj;
 
                 if(i.returned) {
                     statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium inline-block">คืนแล้ว</span>`;
@@ -448,10 +524,11 @@
             const item = borrowHistory.find(i => i.id === activeReturnId);
             const condition = document.getElementById('returnCondition').value;
             const now = new Date();
+            const dueDateObj = item.rawDueDate ? new Date(item.rawDueDate) : null;
 
             let lateDays = 0;
-            if(item.rawDueDate && now > item.rawDueDate) {
-                const diffTime = Math.abs(now - item.rawDueDate);
+            if(dueDateObj && now > dueDateObj) {
+                const diffTime = Math.abs(now - dueDateObj);
                 lateDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             }
 
@@ -485,8 +562,11 @@
             }
 
             closeReturnModal();
+            saveData();
             renderInventory();
             renderHistoryTable();
+
+            syncChannel.postMessage({ type: 'UPDATE_ALL', newInventory: inventory, updatedHistory: borrowHistory });
 
             window.open(LINE_LINK, "_blank");
         }
