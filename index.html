@@ -18,13 +18,13 @@
 
     <!-- 1. หน้าเข้าสู่ระบบ (LOGIN SECTION) -->
     <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 w-full max-w-md space-y-6">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200 w-full max-w-md space-y-6">
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl">
                     <i class="fa-solid fa-volleyball"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800">เข้าสู่ระบบยืม-คืนอุปกรณ์</h1>
-                <p class="text-xs text-slate-400">กรุณากรอกข้อมูลเพื่อเข้าใช้งานระบบ</p>
+                <h1 class="text-2xl font-bold text-slate-800 break-words">เข้าสู่ระบบยืม-คืนอุปกรณ์</h1>
+                <p class="text-xs text-slate-400 break-words">กรุณากรอกข้อมูลเพื่อเข้าใช้งานระบบ</p>
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-4">
@@ -50,7 +50,8 @@
                 <div id="adminFields" class="hidden space-y-3">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน Admin</label>
-                        <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน (admin123)" class="w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <!-- ลบ (admin123) ออกแล้ว -->
+                        <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน" class="w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                     </div>
                 </div>
 
@@ -62,51 +63,51 @@
     </div>
 
     <!-- 2. หน้าหลักระบบ (MAIN SYSTEM SECTION) -->
-    <div id="mainPage" class="hidden p-4 md:p-8">
+    <div id="mainPage" class="hidden p-3 sm:p-4 md:p-8">
         <div class="max-w-6xl mx-auto space-y-6">
 
-            <!-- Header (ซ่อนชื่อ/ยศ Admin) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-volleyball text-blue-600"></i> ระบบยืม-คืนอุปกรณ์กีฬา
+            <!-- Header -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="w-full md:w-auto">
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2 break-words">
+                        <i class="fa-solid fa-volleyball text-blue-600 shrink-0"></i> ระบบยืม-คืนอุปกรณ์กีฬา
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1">labuakannika451-cmyk.github.io/Borrowing-sports-equipment</p>
+                    <p class="text-xs text-slate-400 mt-1 break-all">labuakannika451-cmyk.github.io/Borrowing-sports-equipment</p>
                 </div>
-                <div class="flex items-center gap-3 self-end md:self-auto">
-                    <div class="text-right">
-                        <span id="currentUserDisplay" class="text-sm font-medium text-slate-700 block"></span>
+                <div class="flex items-center justify-between md:justify-end w-full md:w-auto gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                    <div class="text-left md:text-right">
+                        <span id="currentUserDisplay" class="text-sm font-medium text-slate-700 block break-words"></span>
                     </div>
-                    <button onclick="handleLogout()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-sm px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
+                    <button onclick="handleLogout()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-sm px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5 shrink-0">
                         <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
                     </button>
                 </div>
             </div>
 
             <!-- Admin Management Bar -->
-            <div id="adminControlBar" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl flex justify-between items-center">
-                <div class="font-medium text-amber-900 flex items-center gap-2 text-sm">
-                    <i class="fa-solid fa-wrench"></i> ส่วนจัดการคลังสำหรับแอดมิน
+            <div id="adminControlBar" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="font-medium text-amber-900 flex items-center gap-2 text-sm break-words">
+                    <i class="fa-solid fa-wrench shrink-0"></i> ส่วนจัดการคลังสำหรับแอดมิน
                 </div>
-                <button onclick="addNewEquipment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg transition font-medium flex items-center gap-1">
+                <button onclick="addNewEquipment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg transition font-medium flex items-center gap-1 w-full sm:w-auto justify-center">
                     <i class="fa-solid fa-plus"></i> เพิ่มอุปกรณ์ใหม่
                 </button>
             </div>
 
             <!-- Section 1: รายการอุปกรณ์กีฬาในคลัง -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 break-words">
                     📦 รายการอุปกรณ์กีฬาในคลัง
                 </h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[500px]">
                         <thead>
                             <tr class="border-b bg-slate-50 text-slate-600 text-sm">
-                                <th class="p-3">รหัส</th>
-                                <th class="p-3">ชื่ออุปกรณ์</th>
-                                <th class="p-3">จำนวนคงเหลือ</th>
-                                <th class="p-3">สถานะ</th>
-                                <th class="p-3 text-center">จัดการ</th>
+                                <th class="p-3 whitespace-nowrap">รหัส</th>
+                                <th class="p-3 whitespace-nowrap">ชื่ออุปกรณ์</th>
+                                <th class="p-3 whitespace-nowrap">จำนวนคงเหลือ</th>
+                                <th class="p-3 whitespace-nowrap">สถานะ</th>
+                                <th class="p-3 text-center whitespace-nowrap">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryTable" class="text-sm divide-y"></tbody>
@@ -114,38 +115,38 @@
                 </div>
             </div>
 
-            <!-- Section 2: ฟอร์มยืมอุปกรณ์กีฬา (ดึงชื่อผู้ยืมอัตโนมัติ) -->
-            <div id="borrowFormSection" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <!-- Section 2: ฟอร์มยืมอุปกรณ์กีฬา -->
+            <div id="borrowFormSection" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 break-words">
                     📝 ฟอร์มยืมอุปกรณ์กีฬา
                 </h2>
                 <form onsubmit="handleBorrow(event)" class="flex flex-col md:flex-row gap-3">
-                    <input type="text" id="borrowerInfoDisplay" readonly class="px-4 py-2 border rounded-lg bg-slate-100 text-slate-600 outline-none md:w-1/3 text-sm font-medium" title="ข้อมูลผู้ยืม">
+                    <input type="text" id="borrowerInfoDisplay" readonly class="px-4 py-2 border rounded-lg bg-slate-100 text-slate-600 outline-none md:w-1/3 text-sm font-medium break-words" title="ข้อมูลผู้ยืม">
                     <select id="itemSelect" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-2/3 text-sm"></select>
                     <input type="number" id="itemQty" min="1" value="1" required class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-1/6 text-sm">
-                    <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition duration-200 text-sm flex items-center justify-center gap-2">
+                    <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition duration-200 text-sm flex items-center justify-center gap-2 whitespace-nowrap">
                         ยืมอุปกรณ์
                     </button>
                 </form>
             </div>
 
-            <!-- Section 3: ประวัติการยืม-คืน (แสดงวันเวลา & User ห้ามกดคืนเอง) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <!-- Section 3: ประวัติการยืม-คืน -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 break-words">
                     📋 ประวัติการยืม-คืน (แสดงวันและเวลา)
                 </h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="border-b bg-slate-50 text-slate-600 text-sm">
-                                <th class="p-3">ผู้ยืม (ชื่อ - รหัส)</th>
-                                <th class="p-3">รายการ</th>
-                                <th class="p-3">จำนวน</th>
-                                <th class="p-3">เวลาที่ยืม</th>
-                                <th class="p-3">กำหนดคืน</th>
-                                <th class="p-3">เวลาที่คืนจริง</th>
-                                <th class="p-3">สถานะ</th>
-                                <th class="p-3 text-center">จัดการ</th>
+                                <th class="p-3 whitespace-nowrap">ผู้ยืม (ชื่อ - รหัส)</th>
+                                <th class="p-3 whitespace-nowrap">รายการ</th>
+                                <th class="p-3 whitespace-nowrap">จำนวน</th>
+                                <th class="p-3 whitespace-nowrap">เวลาที่ยืม</th>
+                                <th class="p-3 whitespace-nowrap">กำหนดคืน</th>
+                                <th class="p-3 whitespace-nowrap">เวลาที่คืนจริง</th>
+                                <th class="p-3 whitespace-nowrap">สถานะ</th>
+                                <th class="p-3 text-center whitespace-nowrap">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody id="historyTable" class="text-sm divide-y"></tbody>
@@ -157,12 +158,12 @@
     </div>
 
     <!-- Modal คืนสินค้าสำหรับ ADMIN -->
-    <div id="returnModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
-            <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-clipboard-check text-green-600"></i> อนุมัติการคืนอุปกรณ์ (Admin Only)
+    <div id="returnModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4">
+            <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2 break-words">
+                <i class="fa-solid fa-clipboard-check text-green-600 shrink-0"></i> อนุมัติการคืนอุปกรณ์ (Admin Only)
             </h3>
-            <div id="modalItemInfo" class="bg-slate-50 p-3 rounded-xl text-sm text-slate-600 space-y-1"></div>
+            <div id="modalItemInfo" class="bg-slate-50 p-3 rounded-xl text-sm text-slate-600 space-y-1 break-words"></div>
             
             <form onsubmit="confirmReturn(event)" class="space-y-3">
                 <div>
@@ -173,10 +174,10 @@
                         <option value="lost">🚨 อุปกรณ์สูญหาย</option>
                     </select>
                 </div>
-                <div id="fineCalculationDisplay" class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1"></div>
+                <div id="fineCalculationDisplay" class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1 break-words"></div>
                 <div class="flex gap-2 justify-end pt-2">
-                    <button type="button" onclick="closeReturnModal()" class="px-4 py-2 bg-slate-200 text-slate-600 rounded-xl text-sm font-medium">ยกเลิก</button>
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700">ยืนยันบันทึกเวลาคืน & ส่ง LINE</button>
+                    <button type="button" onclick="closeReturnModal()" class="px-4 py-2 bg-slate-200 text-slate-600 rounded-xl text-sm font-medium whitespace-nowrap">ยกเลิก</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 whitespace-nowrap">ยืนยันบันทึกเวลาคืน & ส่ง LINE</button>
                 </div>
             </form>
         </div>
@@ -186,10 +187,8 @@
         let currentUser = null; 
         let activeReturnId = null;
         
-        // ลิงก์ LINE Official Account ของคุณ
         const LINE_LINK = "https://line.me/R/ti/p/@428xebij"; 
 
-        // ข้อมูลคลังอุปกรณ์
         let inventory = [
             { id: "SP01", name: "ลูกฟุตบอล", qty: 10 },
             { id: "SP02", name: "บาสเกตบอล", qty: 5 },
@@ -198,7 +197,6 @@
             { id: "SP05", name: "ลูกปิงปอง", qty: 20 }
         ];
 
-        // ประวัติการยืม
         let borrowHistory = [
             { 
                 id: 1, 
@@ -250,7 +248,6 @@
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainPage').classList.remove('hidden');
 
-            // ซ่อนป้ายชื่อ Admin บนหน้าเว็บ
             document.getElementById('currentUserDisplay').innerText = currentUser.role === 'admin' ? '' : `${currentUser.name} (${currentUser.studentId})`;
             document.getElementById('borrowerInfoDisplay').value = `${currentUser.name} (${currentUser.studentId})`;
 
@@ -282,25 +279,25 @@
             tbody.innerHTML = inventory.map(item => {
                 const isAvailable = item.qty > 0;
                 const statusBadge = isAvailable 
-                    ? `<span class="bg-emerald-700 text-white px-3 py-1 rounded-full text-xs font-medium">พร้อมยืม</span>`
-                    : `<span class="bg-rose-600 text-white px-3 py-1 rounded-full text-xs font-medium">ของหมด</span>`;
+                    ? `<span class="bg-emerald-700 text-white px-3 py-1 rounded-full text-xs font-medium inline-block">พร้อมยืม</span>`
+                    : `<span class="bg-rose-600 text-white px-3 py-1 rounded-full text-xs font-medium inline-block">ของหมด</span>`;
                 
                 let actionBtn = '';
                 if (currentUser && currentUser.role === 'admin') {
-                    actionBtn = `<button onclick="editStock('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-1 rounded-lg text-xs font-medium">แก้ไขสต็อก</button>`;
+                    actionBtn = `<button onclick="editStock('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-1 rounded-lg text-xs font-medium whitespace-nowrap">แก้ไขสต็อก</button>`;
                 } else {
                     actionBtn = isAvailable 
-                        ? `<button onclick="selectItemToBorrow('${item.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1 rounded-lg text-xs font-medium">ยืม</button>`
-                        : `<button disabled class="bg-slate-400 text-white px-4 py-1 rounded-lg text-xs font-medium cursor-not-allowed">ยืม</button>`;
+                        ? `<button onclick="selectItemToBorrow('${item.id}')" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1 rounded-lg text-xs font-medium whitespace-nowrap">ยืม</button>`
+                        : `<button disabled class="bg-slate-400 text-white px-4 py-1 rounded-lg text-xs font-medium cursor-not-allowed whitespace-nowrap">ยืม</button>`;
                 }
 
                 return `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-semibold text-slate-700">${item.id}</td>
-                        <td class="p-3 font-medium text-slate-800">${item.name}</td>
-                        <td class="p-3 text-slate-600">${item.qty} ชิ้น</td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3 text-center">${actionBtn}</td>
+                        <td class="p-3 font-semibold text-slate-700 whitespace-nowrap">${item.id}</td>
+                        <td class="p-3 font-medium text-slate-800 break-words">${item.name}</td>
+                        <td class="p-3 text-slate-600 whitespace-nowrap">${item.qty} ชิ้น</td>
+                        <td class="p-3 whitespace-nowrap">${statusBadge}</td>
+                        <td class="p-3 text-center whitespace-nowrap">${actionBtn}</td>
                     </tr>
                 `;
             }).join('');
@@ -342,7 +339,6 @@
             return `${day}/${month}/${year}, ${hours}:${minutes}`;
         }
 
-        // การยืมอุปกรณ์ (บังคับกดตกลงเปิด LINE เท่านั้น)
         function handleBorrow(e) {
             e.preventDefault();
             const itemId = document.getElementById('itemSelect').value;
@@ -380,7 +376,6 @@
                 renderInventory();
                 renderHistoryTable();
 
-                // เปิด LINE บอทของคุณ (@428xebij)
                 window.open(LINE_LINK, "_blank");
             } else {
                 alert("❌ รายการยืมถูกยกเลิก! คุณจำเป็นต้องกดตกลงเพื่อยืนยันการแจ้งเตือนผ่าน LINE จึงจะสามารถยืมอุปกรณ์ได้");
@@ -401,33 +396,32 @@
                 const isOverdue = !i.returned && i.rawDueDate && now > i.rawDueDate;
 
                 if(i.returned) {
-                    statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">คืนแล้ว</span>`;
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium inline-block">คืนแล้ว</span>`;
                 } else if(isOverdue) {
-                    statusBadge = `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-xs font-medium">🚨 เลยกำหนดคืน</span>`;
+                    statusBadge = `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-xs font-medium inline-block">🚨 เลยกำหนดคืน</span>`;
                 } else {
-                    statusBadge = `<span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium">ยืมอยู่</span>`;
+                    statusBadge = `<span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium inline-block">ยืมอยู่</span>`;
                 }
 
-                // ล็อกสิทธิ์ User ห้ามกดคืนเอง
                 let actionBtn = '';
                 if (currentUser && currentUser.role === 'admin' && !i.returned) {
-                    actionBtn = `<button onclick="openReturnModal(${i.id})" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition font-medium">อนุมัติคืน / ตรวจสภาพ</button>`;
+                    actionBtn = `<button onclick="openReturnModal(${i.id})" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition font-medium whitespace-nowrap">อนุมัติคืน / ตรวจสภาพ</button>`;
                 } else if (i.returned) {
-                    actionBtn = `<span class="text-xs text-slate-400">คืนเรียบร้อย</span>`;
+                    actionBtn = `<span class="text-xs text-slate-400 whitespace-nowrap">คืนเรียบร้อย</span>`;
                 } else {
-                    actionBtn = `<span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">ติดต่อ Admin เพื่อคืน</span>`;
+                    actionBtn = `<span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded whitespace-nowrap">ติดต่อ Admin เพื่อคืน</span>`;
                 }
 
                 return `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-semibold text-slate-700">${i.borrowerName} <span class="text-slate-400 text-xs block">(${i.studentId})</span></td>
-                        <td class="p-3 font-medium text-slate-700">${i.itemName}</td>
-                        <td class="p-3 text-slate-600">${i.qty}</td>
-                        <td class="p-3 text-xs text-slate-600">${i.borrowTime}</td>
-                        <td class="p-3 text-xs text-slate-600">${i.dueTime}</td>
-                        <td class="p-3 text-xs font-medium ${i.returnTime !== '-' ? 'text-emerald-600' : 'text-slate-400'}">${i.returnTime}</td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3 text-center">${actionBtn}</td>
+                        <td class="p-3 font-semibold text-slate-700 break-words">${i.borrowerName} <span class="text-slate-400 text-xs block">(${i.studentId})</span></td>
+                        <td class="p-3 font-medium text-slate-700 break-words">${i.itemName}</td>
+                        <td class="p-3 text-slate-600 whitespace-nowrap">${i.qty}</td>
+                        <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${i.borrowTime}</td>
+                        <td class="p-3 text-xs text-slate-600 whitespace-nowrap">${i.dueTime}</td>
+                        <td class="p-3 text-xs font-medium whitespace-nowrap ${i.returnTime !== '-' ? 'text-emerald-600' : 'text-slate-400'}">${i.returnTime}</td>
+                        <td class="p-3 whitespace-nowrap">${statusBadge}</td>
+                        <td class="p-3 text-center whitespace-nowrap">${actionBtn}</td>
                     </tr>
                 `;
             }).join('');
