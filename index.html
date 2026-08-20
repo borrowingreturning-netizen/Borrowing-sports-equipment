@@ -100,7 +100,7 @@
             <!-- Admin Management Bar -->
             <div id="adminControlBar" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div class="font-medium text-amber-900 flex items-center gap-2 text-sm break-words">
-                    <i class="fa-solid fa-wrench shrink-0"></i> ส่วนจัดการคลังสำหรับแอดมิน (Real-time Sync Active)
+                    <i class="fa-solid fa-wrench shrink-0"></i> ส่วนจัดการคลังสำหรับแอดมิน (Real-time Sync & Email Alert Active)
                 </div>
                 <button onclick="addNewEquipment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg transition font-medium flex items-center gap-1 w-full sm:w-auto justify-center">
                     <i class="fa-solid fa-plus"></i> เพิ่มอุปกรณ์ใหม่
@@ -190,19 +190,20 @@
                 <div id="fineCalculationDisplay" class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1 break-words"></div>
                 <div class="flex gap-2 justify-end pt-2">
                     <button type="button" onclick="closeReturnModal()" class="px-4 py-2 bg-slate-200 text-slate-600 rounded-xl text-sm font-medium whitespace-nowrap">ยกเลิก</button>
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 whitespace-nowrap">ยืนยันบันทึกเวลาคืน & ส่ง LINE</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 whitespace-nowrap">ยืนยันบันทึกเวลาคืน</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
+        // 🔗 URL ของ Google Apps Script ของคุณที่ออกสิทธิ์เรียบร้อยแล้ว
+        const EMAIL_SERVICE_URL = "https://script.google.com/macros/s/AKfycbxlexBc_bQsz3AViW_olukCHPFLMNVwmkywa8ou6WgTBaUq5gzGBfpesCn0cfQfjF6U/exec";
+
         let currentUser = null; 
         let activeReturnId = null;
-        
-        const LINE_LINK = "https://line.me/R/ti/p/@428xebij"; 
 
-        // สร้าง BroadcastChannel เพื่อสื่อสารระหว่างแท็บในเครื่องเดียวกัน
+        // BroadcastChannel สำหรับซิงค์ข้อมูลเรียลไทม์ข้ามแท็บ
         const syncChannel = new BroadcastChannel('sports_borrow_channel');
 
         // ข้อมูลเริ่มต้น
@@ -214,7 +215,6 @@
             { id: "SP05", name: "ลูกปิงปอง", qty: 20 }
         ];
 
-        // อ่านข้อมูลจาก LocalStorage หรือค่าเริ่มต้น
         let inventory = JSON.parse(localStorage.getItem('app_inventory')) || initialInventory;
         let borrowHistory = JSON.parse(localStorage.getItem('app_borrow_history')) || [];
 
@@ -223,10 +223,9 @@
             localStorage.setItem('app_borrow_history', JSON.stringify(borrowHistory));
         }
 
-        // ระบบรับข้อความ Real-time จากแท็บอื่น
+        // รับข้อมูลอัปเดตเรียลไทม์
         syncChannel.onmessage = (event) => {
             const { type, data, newInventory, updatedHistory } = event.data;
-
             if (type === 'UPDATE_ALL') {
                 inventory = newInventory;
                 borrowHistory = updatedHistory;
@@ -234,7 +233,6 @@
                 renderInventory();
                 renderHistoryTable();
 
-                // หากสวมบทบาทเป็น Admin ให้แสดงป๊อปอัป + ส่งเสียงแจ้งเตือน
                 if (currentUser && currentUser.role === 'admin' && data) {
                     playNotificationSound();
                     showToast(`${data.borrowerName} ยืม ${data.itemName} (${data.qty} ชิ้น)`);
@@ -248,8 +246,8 @@
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
                 osc.connect(gain);
@@ -257,7 +255,7 @@
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.4);
             } catch (e) {
-                console.log("Audio play blocked", e);
+                console.log("Audio error", e);
             }
         }
 
@@ -403,6 +401,7 @@
             return `${day}/${month}/${year}, ${hours}:${minutes}`;
         }
 
+        // 🚀 ฟังก์ชันการยืมที่จะส่งอีเมลหาแอดมินทันที
         function handleBorrow(e) {
             e.preventDefault();
             const itemId = document.getElementById('itemSelect').value;
@@ -414,47 +413,53 @@
                 return;
             }
 
-            const confirmLine = confirm("⚠️ [เงื่อนไขการยืมอุปกรณ์]\n\nคุณต้องกด 'ตกลง' เพื่อเชื่อมต่อกับ LINE บอทรับการแจ้งเตือนวันคืนอุปกรณ์\n\n(หากกด 'ยกเลิก' รายการยืมนี้จะไม่สำเร็จ)");
+            item.qty -= qty;
+            const now = new Date();
+            const dueDate = new Date();
+            dueDate.setDate(now.getDate() + 3);
 
-            if (confirmLine) {
-                item.qty -= qty;
+            const newBorrowRecord = {
+                id: Date.now(),
+                borrowerName: currentUser.name,
+                studentId: currentUser.studentId,
+                itemId: item.id,
+                itemName: item.name,
+                qty: qty,
+                borrowTime: formatDateTime(now),
+                dueTime: formatDateTime(dueDate),
+                returnTime: "-",
+                returned: false,
+                rawDueDate: dueDate.toISOString()
+            };
 
-                const now = new Date();
-                const dueDate = new Date();
-                dueDate.setDate(now.getDate() + 3);
+            borrowHistory.unshift(newBorrowRecord);
 
-                const newBorrowRecord = {
-                    id: Date.now(),
-                    borrowerName: currentUser.name,
-                    studentId: currentUser.studentId,
-                    itemId: item.id,
-                    itemName: item.name,
-                    qty: qty,
-                    borrowTime: formatDateTime(now),
-                    dueTime: formatDateTime(dueDate),
-                    returnTime: "-",
-                    returned: false,
-                    rawDueDate: dueDate.toISOString()
-                };
+            saveData();
+            renderInventory();
+            renderHistoryTable();
 
-                borrowHistory.unshift(newBorrowRecord);
+            // ส่งข้อมูลไปยังแท็บอื่นแบบ Real-time
+            syncChannel.postMessage({ 
+                type: 'UPDATE_ALL', 
+                data: newBorrowRecord, 
+                newInventory: inventory, 
+                updatedHistory: borrowHistory 
+            });
 
-                saveData();
-                renderInventory();
-                renderHistoryTable();
-
-                // บรอดแคสต์ส่งข้อมูลไปยังแท็บอื่นทันที
-                syncChannel.postMessage({ 
-                    type: 'UPDATE_ALL', 
-                    data: newBorrowRecord, 
-                    newInventory: inventory, 
-                    updatedHistory: borrowHistory 
-                });
-
-                window.open(LINE_LINK, "_blank");
-            } else {
-                alert("❌ รายการยืมถูกยกเลิก!");
-            }
+            // 📧 ส่งอีเมลแจ้งเตือนไปยังแอดมินแบบ Background
+            fetch(EMAIL_SERVICE_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newBorrowRecord)
+            })
+            .then(() => {
+                alert("✅ ยืมอุปกรณ์สำเร็จ! ระบบได้ส่งอีเมลแจ้งเตือนไปยังแอดมินเรียบร้อยแล้ว");
+            })
+            .catch(err => {
+                console.error("Email fail:", err);
+                alert("✅ บันทึกรายการยืมสำเร็จ!");
+            });
         }
 
         function renderHistoryTable() {
@@ -567,8 +572,6 @@
             renderHistoryTable();
 
             syncChannel.postMessage({ type: 'UPDATE_ALL', newInventory: inventory, updatedHistory: borrowHistory });
-
-            window.open(LINE_LINK, "_blank");
         }
     </script>
 </body>
