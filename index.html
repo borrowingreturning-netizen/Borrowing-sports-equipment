@@ -181,13 +181,12 @@
             <form onsubmit="confirmReturn(event)" class="space-y-3">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">สภาพอุปกรณ์ตอนนำมาคืน:</label>
-                    <select id="returnCondition" onchange="calculateFine()" class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <select id="returnCondition" class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         <option value="normal">✅ สภาพปกติครบถ้วน</option>
                         <option value="damaged">⚠️ อุปกรณ์เสียหาย</option>
                         <option value="lost">🚨 อุปกรณ์สูญหาย</option>
                     </select>
                 </div>
-                <div id="fineCalculationDisplay" class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1 break-words"></div>
                 <div class="flex gap-2 justify-end pt-2">
                     <button type="button" onclick="closeReturnModal()" class="px-4 py-2 bg-slate-200 text-slate-600 rounded-xl text-sm font-medium whitespace-nowrap">ยกเลิก</button>
                     <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 whitespace-nowrap">ยืนยันบันทึกเวลาคืน</button>
@@ -518,39 +517,10 @@
                 <b>กำหนดคืน:</b> ${item.dueTime}
             `;
             document.getElementById('returnModal').classList.remove('hidden');
-            calculateFine();
         }
 
         function closeReturnModal() {
             document.getElementById('returnModal').classList.add('hidden');
-        }
-
-        function calculateFine() {
-            const item = borrowHistory.find(i => i.id === activeReturnId);
-            const condition = document.getElementById('returnCondition').value;
-            const now = new Date();
-            const dueDateObj = item.rawDueDate ? new Date(item.rawDueDate) : null;
-
-            let lateDays = 0;
-            if(dueDateObj && now > dueDateObj) {
-                const diffTime = Math.abs(now - dueDateObj);
-                lateDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            }
-
-            let lateFine = lateDays * 20 * item.qty;
-
-            let text = `<b>🤖 AI คำนวณค่าปรับ:</b><br>`;
-            if(lateDays > 0) text += `• คืนช้า ${lateDays} วัน: ${lateFine} บาท<br>`;
-            if(condition === 'damaged') text += `• สถานะ: อุปกรณ์เสียหาย (ดำเนินการตามระเบียบ)<br>`;
-            if(condition === 'lost') text += `• สถานะ: อุปกรณ์สูญหาย (ดำเนินการตามระเบียบ)<br>`;
-            
-            if(lateFine === 0 && condition === 'normal') {
-                text += `<b class="text-emerald-600">✅ ไม่มีค่าปรับ</b>`;
-            } else if(lateFine > 0) {
-                text += `<b class="text-rose-600">💰 รวมค่าปรับล่าช้า: ${lateFine} บาท</b>`;
-            }
-
-            document.getElementById('fineCalculationDisplay').innerHTML = text;
         }
 
         function confirmReturn(e) {
