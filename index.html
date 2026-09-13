@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบยืม-คืนอุปกรณ์กีฬา</title>
+    <title>Sport & E-Sport Hub - ระบบจัดการกีฬาครบวงจร</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -16,13 +16,13 @@
 </head>
 <body class="bg-slate-50 min-h-screen relative">
 
-    <!-- Toast Notification สำหรับแจ้งเตือน Real-time -->
+    <!-- Toast Notification -->
     <div id="toastNotification" class="hidden fixed top-5 right-5 z-50 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 max-w-sm flex items-start gap-3 transition-all transform duration-300">
         <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center shrink-0 text-lg">
             <i class="fa-solid fa-bell animate-bounce"></i>
         </div>
         <div class="flex-1">
-            <h4 class="font-semibold text-sm text-amber-400">แจ้งเตือนรายการยืมใหม่!</h4>
+            <h4 class="font-semibold text-sm text-amber-400">แจ้งเตือนระบบ</h4>
             <p id="toastMessage" class="text-xs text-slate-300 mt-1 break-words"></p>
         </div>
         <button onclick="hideToast()" class="text-slate-400 hover:text-white text-xs p-1">
@@ -30,15 +30,15 @@
         </button>
     </div>
 
-    <!-- 1. หน้าเข้าสู่ระบบ (LOGIN SECTION) -->
+    <!-- 1. LOGIN SECTION -->
     <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200 w-full max-w-md space-y-6">
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl">
-                    <i class="fa-solid fa-volleyball"></i>
+                    <i class="fa-solid fa-trophy"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800 break-words">เข้าสู่ระบบยืม-คืนอุปกรณ์</h1>
-                <p class="text-xs text-slate-400 break-words">กรุณากรอกข้อมูลเพื่อเข้าใช้งานระบบ</p>
+                <h1 class="text-2xl font-bold text-slate-800 break-words">Sport & E-Sport Hub</h1>
+                <p class="text-xs text-slate-400 break-words">เข้าสู่ระบบเพื่อใช้งานระบบกีฬาครบวงจร</p>
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-4">
@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <!-- 2. หน้าหลักระบบ (MAIN SYSTEM SECTION) -->
+    <!-- 2. MAIN SYSTEM SECTION -->
     <div id="mainPage" class="hidden p-3 sm:p-4 md:p-8">
         <div class="max-w-6xl mx-auto space-y-6">
 
@@ -83,9 +83,9 @@
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div class="w-full md:w-auto">
                     <h1 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2 break-words">
-                        <i class="fa-solid fa-volleyball text-blue-600 shrink-0"></i> ระบบยืม-คืนอุปกรณ์กีฬา
+                        <i class="fa-solid fa-trophy text-blue-600 shrink-0"></i> Sport & E-Sport Web App
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1 break-all">labuakannika451-cmyk.github.io/Borrowing-sports-equipment</p>
+                    <p class="text-xs text-slate-400 mt-1 break-all">ระบบจัดการกีฬา ยืมคืนอุปกรณ์ จับคู่ AI และนับคะแนน</p>
                 </div>
                 <div class="flex items-center justify-between md:justify-end w-full md:w-auto gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
                     <div class="text-left md:text-right">
@@ -97,73 +97,199 @@
                 </div>
             </div>
 
-            <!-- Admin Management Bar -->
-            <div id="adminControlBar" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="font-medium text-amber-900 flex items-center gap-2 text-sm break-words">
-                    <i class="fa-solid fa-wrench shrink-0"></i> ส่วนจัดการคลังสำหรับแอดมิน (Real-time Sync & Email Alert Active)
-                </div>
-                <button onclick="addNewEquipment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg transition font-medium flex items-center gap-1 w-full sm:w-auto justify-center">
-                    <i class="fa-solid fa-plus"></i> เพิ่มอุปกรณ์ใหม่
+            <!-- Navigation Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
+                <button onclick="switchTab('borrow')" id="tab-borrow" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-box-archive"></i> ยืม-คืนอุปกรณ์
+                </button>
+                <button onclick="switchTab('matchmaking')" id="tab-matchmaking" class="tab-btn bg-white text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-robot"></i> AI จับคู่แมตช์
+                </button>
+                <button onclick="switchTab('scoreboard')" id="tab-scoreboard" class="tab-btn bg-white text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-tablet-screen-button"></i> นับคะแนน (iPad)
+                </button>
+                <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn bg-white text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-book"></i> กติกาการเล่น
                 </button>
             </div>
 
-            <!-- Section 1: รายการอุปกรณ์กีฬาในคลัง -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 break-words">
-                    📦 รายการอุปกรณ์กีฬาในคลัง
-                </h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[500px]">
-                        <thead>
-                            <tr class="border-b bg-slate-50 text-slate-600 text-sm">
-                                <th class="p-3 whitespace-nowrap">รหัส</th>
-                                <th class="p-3 whitespace-nowrap">ชื่ออุปกรณ์</th>
-                                <th class="p-3 whitespace-nowrap">จำนวนคงเหลือ</th>
-                                <th class="p-3 whitespace-nowrap">สถานะ</th>
-                                <th class="p-3 text-center whitespace-nowrap">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventoryTable" class="text-sm divide-y"></tbody>
-                    </table>
+            <!-- TAB 1: Borrowing Section -->
+            <div id="content-borrow" class="space-y-6">
+                <!-- Admin Management Bar -->
+                <div id="adminControlBar" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="font-medium text-amber-900 flex items-center gap-2 text-sm break-words">
+                        <i class="fa-solid fa-wrench shrink-0"></i> ส่วนจัดการคลังสำหรับแอดมิน (Real-time Sync)
+                    </div>
+                    <button onclick="addNewEquipment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg transition font-medium flex items-center gap-1 w-full sm:w-auto justify-center">
+                        <i class="fa-solid fa-plus"></i> เพิ่มอุปกรณ์ใหม่
+                    </button>
+                </div>
+
+                <!-- Section 1: รายการอุปกรณ์กีฬาในคลัง -->
+                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 break-words">
+                        📦 รายการอุปกรณ์กีฬาในคลัง
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[500px]">
+                            <thead>
+                                <tr class="border-b bg-slate-50 text-slate-600 text-sm">
+                                    <th class="p-3 whitespace-nowrap">รหัส</th>
+                                    <th class="p-3 whitespace-nowrap">ชื่ออุปกรณ์</th>
+                                    <th class="p-3 whitespace-nowrap">จำนวนคงเหลือ</th>
+                                    <th class="p-3 whitespace-nowrap">สถานะ</th>
+                                    <th class="p-3 text-center whitespace-nowrap">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTable" class="text-sm divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section 2: ฟอร์มยืมอุปกรณ์กีฬา -->
+                <div id="borrowFormSection" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 break-words">
+                        📝 ฟอร์มยืมอุปกรณ์กีฬา
+                    </h2>
+                    <form onsubmit="handleBorrow(event)" class="flex flex-col md:flex-row gap-3">
+                        <input type="text" id="borrowerInfoDisplay" readonly class="px-4 py-2 border rounded-lg bg-slate-100 text-slate-600 outline-none md:w-1/3 text-sm font-medium break-words">
+                        <select id="itemSelect" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-2/3 text-sm"></select>
+                        <input type="number" id="itemQty" min="1" value="1" required class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-1/6 text-sm">
+                        <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition duration-200 text-sm flex items-center justify-center gap-2 whitespace-nowrap">
+                            ยืมอุปกรณ์
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Section 3: ประวัติการยืม-คืน -->
+                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 break-words">
+                        📋 ประวัติการยืม-คืน
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[700px]">
+                            <thead>
+                                <tr class="border-b bg-slate-50 text-slate-600 text-sm">
+                                    <th class="p-3 whitespace-nowrap">ผู้ยืม (ชื่อ - รหัส)</th>
+                                    <th class="p-3 whitespace-nowrap">รายการ</th>
+                                    <th class="p-3 whitespace-nowrap">จำนวน</th>
+                                    <th class="p-3 whitespace-nowrap">เวลาที่ยืม</th>
+                                    <th class="p-3 whitespace-nowrap">กำหนดคืน</th>
+                                    <th class="p-3 whitespace-nowrap">เวลาที่คืนจริง</th>
+                                    <th class="p-3 whitespace-nowrap">สถานะ</th>
+                                    <th class="p-3 text-center whitespace-nowrap">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTable" class="text-sm divide-y"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Section 2: ฟอร์มยืมอุปกรณ์กีฬา -->
-            <div id="borrowFormSection" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 break-words">
-                    📝 ฟอร์มยืมอุปกรณ์กีฬา
-                </h2>
-                <form onsubmit="handleBorrow(event)" class="flex flex-col md:flex-row gap-3">
-                    <input type="text" id="borrowerInfoDisplay" readonly class="px-4 py-2 border rounded-lg bg-slate-100 text-slate-600 outline-none md:w-1/3 text-sm font-medium break-words" title="ข้อมูลผู้ยืม">
-                    <select id="itemSelect" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-2/3 text-sm"></select>
-                    <input type="number" id="itemQty" min="1" value="1" required class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none md:w-1/6 text-sm">
-                    <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition duration-200 text-sm flex items-center justify-center gap-2 whitespace-nowrap">
-                        ยืมอุปกรณ์
+            <!-- TAB 2: AI Matchmaking -->
+            <div id="content-matchmaking" class="hidden space-y-6">
+                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i> AI สุ่มจัดทีมและจับคู่ผู้เล่น
+                    </h2>
+                    <p class="text-xs text-slate-500">ระบบ AI สุ่มจัดคู่ผู้เล่น 4 คน หรือ 6 คนสำหรับแมตช์แรก (เช่น แบดมินตัน/ปิงปอง)</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">ประเภทแมตช์</label>
+                            <select id="matchType" class="w-full px-4 py-2 border rounded-xl outline-none text-sm">
+                                <option value="4">จับคู่ 4 คน (2 vs 2)</option>
+                                <option value="6">จับคู่ 6 คน (3 vs 3 - แมตช์แรก)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">รายชื่อผู้เล่น (คั่นด้วยเครื่องหมายจุลภาค ,)</label>
+                            <input type="text" id="playerNamesInput" placeholder="เช่น สมชาย, สมหญิง, กิตติ, อานนท์, วิภา, ธนกร" class="w-full px-4 py-2 border rounded-xl outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <button onclick="generateAIMatch()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-xl font-medium transition text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-robot"></i> ให้ AI จัดทีมแข่งขัน
                     </button>
-                </form>
+
+                    <div id="aiMatchResult" class="hidden mt-4 p-4 bg-purple-50 border border-purple-200 rounded-xl space-y-3">
+                        <h3 class="font-bold text-purple-900 text-sm">🎯 ผลการจับคู่โดย AI</h3>
+                        <div id="teamsDisplay" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm"></div>
+                        <div class="pt-2 border-t border-purple-200 text-xs text-purple-800">
+                            💡 **ระบบสรุปผล AI:** <span id="topScorerSummary">รอการประมวลผลแมตช์เพื่อสรุปผู้ได้แต้มสูงสุด</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Section 3: ประวัติการยืม-คืน -->
-            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 break-words">
-                    📋 ประวัติการยืม-คืน (แสดงวันและเวลา)
-                </h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[700px]">
-                        <thead>
-                            <tr class="border-b bg-slate-50 text-slate-600 text-sm">
-                                <th class="p-3 whitespace-nowrap">ผู้ยืม (ชื่อ - รหัส)</th>
-                                <th class="p-3 whitespace-nowrap">รายการ</th>
-                                <th class="p-3 whitespace-nowrap">จำนวน</th>
-                                <th class="p-3 whitespace-nowrap">เวลาที่ยืม</th>
-                                <th class="p-3 whitespace-nowrap">กำหนดคืน</th>
-                                <th class="p-3 whitespace-nowrap">เวลาที่คืนจริง</th>
-                                <th class="p-3 whitespace-nowrap">สถานะ</th>
-                                <th class="p-3 text-center whitespace-nowrap">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTable" class="text-sm divide-y"></tbody>
-                    </table>
+            <!-- TAB 3: Scoreboard (iPad Friendly) -->
+            <div id="content-scoreboard" class="hidden space-y-6">
+                <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-chalkboard text-emerald-400"></i> กระดานนับคะแนน (iPad/Mobile Screen)
+                        </h2>
+                        <span class="text-xs bg-slate-800 px-3 py-1 rounded-full text-slate-300">รองรับ แบดมินตัน / ปิงปอง</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 sm:gap-8 text-center">
+                        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-4">
+                            <h3 class="text-lg font-semibold text-blue-400">ฝั่ง A (Team A)</h3>
+                            <div id="scoreA" class="text-6xl sm:text-8xl font-black text-white my-4">0</div>
+                            <div class="flex justify-center gap-2">
+                                <button onclick="addScore('A', 1)" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl text-lg font-bold">+1</button>
+                                <button onclick="addScore('A', -1)" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-lg font-bold">-1</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-4">
+                            <h3 class="text-lg font-semibold text-rose-400">ฝั่ง B (Team B)</h3>
+                            <div id="scoreB" class="text-6xl sm:text-8xl font-black text-white my-4">0</div>
+                            <div class="flex justify-center gap-2">
+                                <button onclick="addScore('B', 1)" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl text-lg font-bold">+1</button>
+                                <button onclick="addScore('B', -1)" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-lg font-bold">-1</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center gap-4 pt-4 border-t border-slate-800">
+                        <button onclick="resetScore()" class="bg-rose-600/20 text-rose-400 border border-rose-500/30 px-6 py-2 rounded-xl text-sm font-medium hover:bg-rose-600/30">
+                            รีเซ็ตคะแนน
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: Sports Rules -->
+            <div id="content-rules" class="hidden space-y-6">
+                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-blue-600"></i> กติกาการเล่นกีฬาเบื้องต้น
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border rounded-xl bg-slate-50 space-y-2">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                🏸 กติกาแบดมินตัน
+                            </h3>
+                            <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+                                <li>แข่งขันประเภท 2 ใน 3 เซต (Set ละ 21 คะแนน)</li>
+                                <li>หากคะแนนเท่ากันที่ 20-20 ต้องเล่นต่อจนกว่าจะมีผลต่าง 2 คะแนน (สูงสุดไม่เกิน 30 คะแนน)</li>
+                                <li>ฝ่ายที่ส่งลูกได้แต้มจะส่งลูกต่อ หากเสียแต้มสิทธิ์ส่งลูกจะเปลี่ยนฝั่ง</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 border rounded-xl bg-slate-50 space-y-2">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                🏓 กติกาปิงปอง (เทเบิลเทนนิส)
+                            </h3>
+                            <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+                                <li>แข่งขันประเภท 3 ใน 5 เซต (Set ละ 11 คะแนน)</li>
+                                <li>สลับการส่งลูกทุกๆ 2 คะแนน</li>
+                                <li>หากคะแนนเท่ากัน 10-10 จะสลับกันส่งลูกคนละ 1 คะแนนจนกว่าจะห่าง 2 คะแนน</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -196,16 +322,15 @@
     </div>
 
     <script>
-        // 🔗 URL ของ Google Apps Script ของคุณที่ออกสิทธิ์เรียบร้อยแล้ว
         const EMAIL_SERVICE_URL = "https://script.google.com/macros/s/AKfycbxlexBc_bQsz3AViW_olukCHPFLMNVwmkywa8ou6WgTBaUq5gzGBfpesCn0cfQfjF6U/exec";
 
         let currentUser = null; 
         let activeReturnId = null;
+        let scoreA = 0;
+        let scoreB = 0;
 
-        // BroadcastChannel สำหรับซิงค์ข้อมูลเรียลไทม์ข้ามแท็บ
         const syncChannel = new BroadcastChannel('sports_borrow_channel');
 
-        // ข้อมูลเริ่มต้น
         const initialInventory = [
             { id: "SP01", name: "ลูกฟุตบอล", qty: 10 },
             { id: "SP02", name: "บาสเกตบอล", qty: 5 },
@@ -222,7 +347,6 @@
             localStorage.setItem('app_borrow_history', JSON.stringify(borrowHistory));
         }
 
-        // รับข้อมูลอัปเดตเรียลไทม์
         syncChannel.onmessage = (event) => {
             const { type, data, newInventory, updatedHistory } = event.data;
             if (type === 'UPDATE_ALL') {
@@ -233,30 +357,10 @@
                 renderHistoryTable();
 
                 if (currentUser && currentUser.role === 'admin' && data) {
-                    playNotificationSound();
                     showToast(`${data.borrowerName} ยืม ${data.itemName} (${data.qty} ชิ้น)`);
                 }
             }
         };
-
-        function playNotificationSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            } catch (e) {
-                console.log("Audio error", e);
-            }
-        }
 
         function showToast(msg) {
             const toast = document.getElementById('toastNotification');
@@ -267,6 +371,19 @@
 
         function hideToast() {
             document.getElementById('toastNotification').classList.add('hidden');
+        }
+
+        function switchTab(tabName) {
+            const tabs = ['borrow', 'matchmaking', 'scoreboard', 'rules'];
+            tabs.forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${t}`);
+                btn.className = 'tab-btn bg-white text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition';
+            });
+
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.className = 'tab-btn bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition';
         }
 
         function toggleLoginFields() {
@@ -305,7 +422,7 @@
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('mainPage').classList.remove('hidden');
 
-            document.getElementById('currentUserDisplay').innerText = currentUser.role === 'admin' ? '' : `${currentUser.name} (${currentUser.studentId})`;
+            document.getElementById('currentUserDisplay').innerText = currentUser.role === 'admin' ? 'โหมดผู้ดูแลระบบ' : `${currentUser.name} (${currentUser.studentId})`;
             document.getElementById('borrowerInfoDisplay').value = `${currentUser.name} (${currentUser.studentId})`;
 
             if (currentUser.role === 'admin') {
@@ -400,7 +517,6 @@
             return `${day}/${month}/${year}, ${hours}:${minutes}`;
         }
 
-        // 🚀 ฟังก์ชันการยืมที่จะส่งอีเมลหาแอดมินทันที
         function handleBorrow(e) {
             e.preventDefault();
             const itemId = document.getElementById('itemSelect').value;
@@ -437,7 +553,6 @@
             renderInventory();
             renderHistoryTable();
 
-            // ส่งข้อมูลไปยังแท็บอื่นแบบ Real-time
             syncChannel.postMessage({ 
                 type: 'UPDATE_ALL', 
                 data: newBorrowRecord, 
@@ -445,20 +560,12 @@
                 updatedHistory: borrowHistory 
             });
 
-            // 📧 ส่งอีเมลแจ้งเตือนไปยังแอดมินแบบ Background
             fetch(EMAIL_SERVICE_URL, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newBorrowRecord)
-            })
-            .then(() => {
-                alert("✅ ยืมอุปกรณ์สำเร็จ! ระบบได้ส่งอีเมลแจ้งเตือนไปยังแอดมินเรียบร้อยแล้ว");
-            })
-            .catch(err => {
-                console.error("Email fail:", err);
-                alert("✅ บันทึกรายการยืมสำเร็จ!");
-            });
+            }).then(() => alert("✅ ยืมอุปกรณ์สำเร็จ! ระบบได้บันทึกข้อมูลแล้ว")).catch(() => alert("✅ ยืมอุปกรณ์สำเร็จ!"));
         }
 
         function renderHistoryTable() {
@@ -542,6 +649,59 @@
             renderHistoryTable();
 
             syncChannel.postMessage({ type: 'UPDATE_ALL', newInventory: inventory, updatedHistory: borrowHistory });
+        }
+
+        // 🤖 ฟังก์ชัน AI จับคู่ผู้เล่น
+        function generateAIMatch() {
+            const matchType = parseInt(document.getElementById('matchType').value);
+            const rawNames = document.getElementById('playerNamesInput').value;
+            let players = rawNames.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+            if (players.length < matchType) {
+                alert(`กรุณากรอกรายชื่อผู้เล่นอย่างน้อย ${matchType} คน`);
+                return;
+            }
+
+            // Shuffle ผู้เล่น
+            players = players.sort(() => Math.random() - 0.5);
+            const selectedPlayers = players.slice(0, matchType);
+
+            const teamA = selectedPlayers.slice(0, matchType / 2);
+            const teamB = selectedPlayers.slice(matchType / 2, matchType);
+
+            document.getElementById('aiMatchResult').classList.remove('hidden');
+            document.getElementById('teamsDisplay').innerHTML = `
+                <div class="bg-white p-3 rounded-lg border border-purple-200">
+                    <span class="font-bold text-blue-600 block mb-1">ทีม A</span>
+                    ${teamA.map(p => `• ${p}`).join('<br>')}
+                </div>
+                <div class="bg-white p-3 rounded-lg border border-purple-200">
+                    <span class="font-bold text-rose-600 block mb-1">ทีม B</span>
+                    ${teamB.map(p => `• ${p}`).join('<br>')}
+                </div>
+            `;
+
+            // สุ่มประมวลผลคะแนน AI
+            const topScorer = selectedPlayers[Math.floor(Math.random() * selectedPlayers.length)];
+            document.getElementById('topScorerSummary').innerText = `AI คาดการณ์ว่า '${topScorer}' มีแนวโน้มได้คะแนนสูงสุดในแมตช์นี้`;
+        }
+
+        // ⏱️ ฟังก์ชันกระดานนับคะแนน
+        function addScore(team, val) {
+            if (team === 'A') {
+                scoreA = Math.max(0, scoreA + val);
+                document.getElementById('scoreA').innerText = scoreA;
+            } else {
+                scoreB = Math.max(0, scoreB + val);
+                document.getElementById('scoreB').innerText = scoreB;
+            }
+        }
+
+        function resetScore() {
+            scoreA = 0;
+            scoreB = 0;
+            document.getElementById('scoreA').innerText = 0;
+            document.getElementById('scoreB').innerText = 0;
         }
     </script>
 </body>
